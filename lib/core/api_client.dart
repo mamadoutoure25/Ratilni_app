@@ -4,6 +4,7 @@ import '../models/surah_model.dart';
 import '../models/reciter_model.dart';
 import '../models/language_model.dart';
 import '../models/rewaya_model.dart';
+import '../models/hadith_model.dart';
 
 class ApiClient {
   static const String baseUrl = 'https://mp3quran.net/api/v3';
@@ -115,6 +116,47 @@ class ApiClient {
       return null;
     } catch (e) {
       return null;
+    }
+  }
+
+// Méthode pour rechercher des Hadiths par mot-clé
+// Méthode pour rechercher des Hadiths par mot-clé AVEC détails
+  Future<List<Hadith>> searchHadiths(String phrase, {String languageCode = 'fr'}) async {
+    // 1. On lance la recherche classique
+    final searchUrl = Uri.parse(
+        'https://hadeethenc.com/api/v1/hadeeths/search/?phrase=$phrase&language=$languageCode');
+
+    final searchResponse = await http.get(searchUrl);
+
+    if (searchResponse.statusCode == 200) {
+      final List searchData = jsonDecode(searchResponse.body);
+
+      // Si la recherche ne donne rien, on retourne une liste vide
+      if (searchData.isEmpty) return [];
+
+      // 2. On extrait les IDs des résultats (on limite aux 20 premiers pour ne pas bloquer l'API)
+      final List<String> ids = searchData.take(20).map((e) => e['id'].toString()).toList();
+
+      // 3. On utilise notre autre méthode pour récupérer les détails de ces IDs précis
+      return await getDetailedHadiths(ids, languageCode: languageCode);
+    } else {
+      throw Exception('Impossible de charger les résultats de recherche');
+    }
+  }
+
+  Future<List<Hadith>> getDetailedHadiths(List<String> ids, {String languageCode = 'fr'}) async {
+    // Transforme la liste d'IDs en chaîne séparée par des virgules (ex: "2962,4560")
+    final idsParam = ids.join(',');
+    final url = Uri.parse(
+        'https://hadeethenc.com/api/v1/hadeeths/multiple/?language=$languageCode&ids=$idsParam');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data.map((e) => Hadith.fromJson(e)).toList();
+    } else {
+      throw Exception('Impossible de charger les détails des Hadiths');
     }
   }
 }

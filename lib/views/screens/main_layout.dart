@@ -5,6 +5,7 @@ import 'surahs_screen.dart';
 import 'favorites_screen.dart';
 import 'more_screen.dart';
 import 'player_screen.dart';
+import 'hadiths_screen.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -21,6 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
     SurahsScreen(),
     SizedBox.shrink(), // Index 2 is intercepted by onTap
     FavoritesScreen(),
+    HadithsScreen(),
     MoreScreen(),
   ];
 
@@ -67,6 +69,10 @@ class _MainLayoutState extends State<MainLayout> {
             BottomNavigationBarItem(
               icon: Icon(LucideIcons.heart),
               label: 'Favoris',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.bookMarked),
+              label: 'Hadiths',
             ),
             BottomNavigationBarItem(
               icon: Icon(LucideIcons.menu),
