@@ -1,0 +1,9 @@
+subprojects {
+    afterEvaluate { project ->
+        if (project.name == "audiotags") {
+            project.android {
+                compileSdkVersion 34
+            }
+        }
+    }
+}
